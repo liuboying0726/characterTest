@@ -73,10 +73,15 @@ class Todoitem extends React.Component{
     }
 }
 class Todofooter extends React.Component{
+    constructor (props) {
+        super(props);
+
+    }
+
     render() {
         return (
             <div className="footer-wrap">
-                <div className="pull-left">1 item left</div>
+                <div className="pull-left">{this.props.nums} item left</div>
                 <div className="pull-right"><a href="#">Clear completed</a></div>
                 <div className="select">
                     <button>All</button>
@@ -93,19 +98,7 @@ class Todolist extends React.Component{
 
         // 初始化
         this.state = {
-            list: [{
-                id: 0,
-                name: 'chifan',
-                status: 1
-            }, {
-                id: 1,
-                name: 'shuijiao',
-                status: 0
-            }, {
-                id: 2,
-                name: 'dadoudou',
-                status: 0
-            }],
+            list: [],
             finished: 0
         }
     }
@@ -162,12 +155,13 @@ class Todolist extends React.Component{
                         <Todoitem
                             item={item}
                             finishChange={this.updateFinished.bind(this)}
+                            toggleChange={this.updateTotal.bind(this)}
                             key={index}
                             />
                         ))
                     }
                 </ul>
-                <Todofooter />
+                <Todofooter nums={this.state.list.length - this.state.finished}/>
             </div>
         )
     }
