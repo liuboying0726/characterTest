@@ -16,7 +16,8 @@ class Todoadd extends React.Component{
         }
         e.preventDefault();
         var len = this.props.nums;
-        var newid = len > 0 ? len : 0;
+
+        var newid = len > 0 ? (len + 1) : 1;
         var value = this.refs.myText.value.trim();
         if(value !== '') {
             var obj = {
@@ -26,6 +27,7 @@ class Todoadd extends React.Component{
             };
             this.refs.myText.value = '';
             this.props.addNewTask(obj);
+            console.log(obj);
         }
 
     }
@@ -41,6 +43,7 @@ class Todoitem extends React.Component{
     constructor (props) {
         super(props);
         this.handleFinished = this.handleFinished.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
     // 切换任务
     handleFinished(){
@@ -52,6 +55,9 @@ class Todoitem extends React.Component{
             status: status
         }
         this.props.finishChange(obj);
+    }
+    handleDelete(){
+        this.props.toggleChange(this.props.item)
     }
     render() {
         var item = this.props.item;
@@ -65,7 +71,8 @@ class Todoitem extends React.Component{
 
                 <li>
                     <input type="checkbox" checked={itemChecked} onChange={this.handleFinished}/>
-                    <label for="">{item.name}</label>
+                    <label htmlFor="">{item.name}</label>
+                    <a href="#" className="pull-right delete-btn" onClick={this.handleDelete}>&times;</a>
                 </li>
 
 
@@ -75,14 +82,17 @@ class Todoitem extends React.Component{
 class Todofooter extends React.Component{
     constructor (props) {
         super(props);
-
+        this.handleDeleteAllCompleted = this.handleDeleteAllCompleted.bind(this);
+    }
+    handleDeleteAllCompleted(){
+        this.props.deleteAllCompleted(this.props.item)
     }
 
     render() {
         return (
-            <div className="footer-wrap">
+            <div className="footer-wrap" style={{display: this.props.display}}>
                 <div className="pull-left">{this.props.nums} item left</div>
-                <div className="pull-right"><a href="#">Clear completed</a></div>
+                <div className="pull-right"><a href="#" className="delete-btn" onClick={this.handleDeleteAllCompleted}>Clear completed</a></div>
                 <div className="select">
                     <button>All</button>
                     <button>Active</button>
@@ -143,7 +153,24 @@ class Todolist extends React.Component{
             finished: sum
         });
     }
+
+    // 删除
+    deleteAllItems () {
+        var obj = [], sum = 0;
+        this.state.list.forEach((item) => {
+            if(item.status === 0){
+                obj.push(item);
+            }
+
+        });
+        this.setState({
+            list: obj,
+            finished: sum
+        });
+    }
+
     render() {
+        var style = this.state.list.length !== 0 ? 'block' : 'none';
         return (
             <div className="App">
                 <header className="App-header">
@@ -161,7 +188,11 @@ class Todolist extends React.Component{
                         ))
                     }
                 </ul>
-                <Todofooter nums={this.state.list.length - this.state.finished}/>
+                <Todofooter display={style}
+                            nums={this.state.list.length - this.state.finished}
+                            deleteAllCompleted={this.deleteAllItems.bind(this)}
+                    />
+
             </div>
         )
     }
